@@ -12,7 +12,7 @@ library(ROCR)
 
 # Loading in Data
 theData <- read_delim(
-  "~/topics/hw4/PassFail.dat",
+  "~/Desktop/code/topics/logistic-regression/PassFail.dat",
   " ",
   escape_double = FALSE,
   col_names = FALSE,

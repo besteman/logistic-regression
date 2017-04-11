@@ -21,8 +21,10 @@ rm(list = ls())
 ### Loading Libraries
 
 ```{r libraries, echo=TRUE, message=FALSE, warning=FALSE}
-
+# Used to read in the data est
 library(readr)
+
+# Used to make the graph of the ROCR
 library(ROCR)
 
 ```
@@ -33,7 +35,7 @@ library(ROCR)
 
 # Loading in Data
 theData <- read_delim(
-  "~/topics/hw4/PassFail.dat",
+  "~/Desktop/code/topics/logistic-regression/PassFail.dat",
   " ",
   escape_double = FALSE,
   col_names = FALSE,
@@ -79,15 +81,22 @@ numberOfObservation
 
 ```{r part-c}
 
-
+# Setting the set seed of the random number generator for consistent testing
 set.seed(123321)
 
+# Making index a vector of that holds the number of observation 
+# I.E (1,2,3, ..... , 10000)
 index <- c(1:numberOfObservation)
 
+# Setting random6000 to the random sample of 6000
+# Using sample() to grab 6000 random sample
 random6000 <- sample(index, numberOfObservation * .60)
 
+# trainingSamplePassFail to random sample of indices of index and 
+# pulling then from PassFail data
 trainingSamplePassFail <- PassFail[random6000 ,]
 
+# testData will hold the rest of the 4000 data sampl
 testData <-  PassFail[-random6000 ,]
 
 
@@ -99,6 +108,8 @@ testData <-  PassFail[-random6000 ,]
 
 ```{r part-d}
 
+# Running glm on the trainSamplePassFail data
+# Formula y = x1 + x2 + x3 + x4 + x5 + x6
 model <- glm(y  ~ . , data = trainingSamplePassFail , family = binomial(link = "logit"))
 
 model
@@ -111,11 +122,23 @@ model
 
 ```{r part-e}
 
-fitted.results <- predict(model, testData ,type='response')
-fitted.results <- ifelse(fitted.results > 0.5,1,0)
+# Testing the prediction
 
-misClasificError <- mean(fitted.results != testData$y)
-print(paste('Accuracy',1-misClasificError))
+# Testing the model against the testData
+results <- predict(model, testData ,type='response')
+
+# Using ifelse to test it best on .5 
+results <- ifelse(results > 0.5,1,0)
+
+# Finding the error
+error <- mean(results != testData$y)
+
+error
+
+# Showing the Accuracy of the model
+accuracy <- 1 - error
+
+accuracy
 
 ```
 
@@ -124,6 +147,8 @@ print(paste('Accuracy',1-misClasificError))
 
 
 ```{r part-f}
+# Using the ROCR Package here
+
 
 p <- predict(model,testData, type="response")
 pr <- prediction(p, testData$y)
@@ -133,7 +158,10 @@ auc <- performance(pr, measure = "auc")
 auc <- auc@y.values[[1]]
 auc
 
+# Ploting the curve
 plot(prf)
+
+# Plotting the random guessing line
 abline(a = 0 , b = 1 , lty = 3)
 
 ```
